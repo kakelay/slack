@@ -1,101 +1,172 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useState, useEffect, useRef } from "react";
+import Image from 'next/image';
+
+// Header Component with Responsive Mobile Menu
+function Header() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
+  // Close menu if clicking outside of the header
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        headerRef.current &&
+        !headerRef.current.contains(event.target as Node)
+      ) {
+        setMenuOpen(false);
+      }
+    };
+
+    if (menuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuOpen]);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <header
+      ref={headerRef}
+      className="w-full bg-gray-800 text-white p-4 flex justify-between items-center relative"
+    >
+      <h1 className="text-lg font-semibold">Admin Dashboard</h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+      {/* Desktop Menu */}
+      <nav className="hidden sm:block">
+        <ul className="flex gap-4 items-center">
+          <li>
+            <a href="#" className="hover:underline">
+              Home
+            </a>
+          </li>
+          <li>
+            <a href="#" className="hover:underline">
+              Settings
+            </a>
+          </li>
+          <li>
+            <a href="#" className="hover:underline">
+              Profile
+            </a>
+          </li>
+          {/* Profile Image for Desktop */}
+          <li>
             <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+              src="https://avatars.githubusercontent.com/u/110383694?s=96&v=4"
+              alt="Profile"
+              width={40} // Adjust size as needed
+              height={40} // Adjust size as needed
+              className="rounded-full"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          </li>
+        </ul>
+      </nav>
+
+      {/* Hamburger Icon for Mobile */}
+      <div className="sm:hidden">
+        <button onClick={toggleMenu} className="text-white focus:outline-none">
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            Read our docs
-          </a>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d={menuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
+            ></path>
+          </svg>
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <nav className="absolute top-full left-0 w-full bg-gray-800 text-white sm:hidden">
+          <ul className="flex flex-col gap-4 p-4">
+            <li>
+              <a href="#" className="hover:underline">
+                Home
+              </a>
+            </li>
+            <li>
+              <a href="#" className="hover:underline">
+                Settings
+              </a>
+            </li>
+            <li>
+              <a href="#" className="hover:underline">
+                Profile
+              </a>
+            </li>
+            {/* Profile Image for Mobile */}
+            <li className="text-center mt-4">
+              <Image
+                src="https://avatars.githubusercontent.com/u/110383694?s=96&v=4"
+                alt="Profile"
+                width={80} // Adjust size as needed
+                height={80} // Adjust size as needed
+                className="rounded-full"
+              />
+            </li>
+          </ul>
+        </nav>
+      )}
+    </header>
+  );
+}
+
+// Body Component (Dashboard Content)
+function DashboardBody() {
+  return (
+    <main className="flex-grow p-8 bg-gray-100">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {/* Example cards, you can replace these with actual content */}
+        <div className="p-6 bg-white shadow rounded">
+          <h2 className="font-semibold text-lg mb-2">Users</h2>
+          <p>Manage user accounts and permissions.</p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <div className="p-6 bg-white shadow rounded">
+          <h2 className="font-semibold text-lg mb-2">Analytics</h2>
+          <p>View site analytics and reports.</p>
+        </div>
+        <div className="p-6 bg-white shadow rounded">
+          <h2 className="font-semibold text-lg mb-2">Settings</h2>
+          <p>Customize the admin dashboard settings.</p>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+// Footer Component
+function Footer() {
+  return (
+    <footer className="w-full bg-gray-800 text-white p-4 text-center">
+      <p>&copy; 2024 Admin Dashboard. All rights reserved.</p>
+    </footer>
+  );
+}
+
+// Main Component (Combining Header, Body, Footer)
+export default function AdminDashboard() {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <DashboardBody />
+      <Footer />
     </div>
   );
 }
